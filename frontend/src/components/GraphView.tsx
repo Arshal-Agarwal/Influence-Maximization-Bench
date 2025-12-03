@@ -13,14 +13,14 @@ interface GraphViewProps {
 }
 
 export function GraphView({ elements }: GraphViewProps) {
-  // If backend provides positions → use them directly (NO layout)
+
   const hasPositions =
     elements.nodes.length > 0 &&
     elements.nodes[0].position &&
     typeof elements.nodes[0].position.x === "number";
 
   const layout = hasPositions
-    ? { name: "preset" } // use backend layout
+    ? { name: "preset" }
     : {
         name: "fcose",
         animate: true,
@@ -31,48 +31,52 @@ export function GraphView({ elements }: GraphViewProps) {
 
   const stylesheet = [
     // -------------------------------------------------------
-    // DEFAULT NODES — SHOULD BE FADED IF NOT SEED/INFLUENCED
+    // DEFAULT NODES (BACKGROUND)
     // -------------------------------------------------------
     {
       selector: "node",
       style: {
-        "background-color": "#94a3b8", // slate-400
-        "opacity": 0.25,               // <-- fade by default
-        "width": 12,
-        "height": 12,
+        "background-color": "#64748b", // slate gray
+        "opacity": 0.25,
+        "width": 10,
+        "height": 10,
         "label": "",
+        "z-index-compare": "manual",
+        "z-index": 0, // BEHIND EVERYTHING
       },
     },
 
     // -------------------------------------------------------
-    // SEED NODES — BRIGHT + GLOW
+    // SEED NODES (BLUE + HIGHEST PRIORITY)
     // -------------------------------------------------------
     {
       selector: "node[isSeed = true]",
       style: {
-        "background-color": "#22c55e",
+        "background-color": "#880808", // BLUE
         "opacity": 1,
         "border-width": 4,
-        "border-color": "#166534",
+        "border-color": "#1e40af",
         "width": 28,
         "height": 28,
         "label": "data(label)",
         "color": "white",
         "font-size": "10px",
         "text-outline-width": 2,
-        "text-outline-color": "#166534",
+        "text-outline-color": "#1e40af",
         "shadow-blur": 25,
-        "shadow-color": "rgba(34,197,94,0.45)",
+        "shadow-color": "rgba(59,130,246,0.45)",
+        "z-index-compare": "manual",
+        "z-index": 999, // ALWAYS ON TOP
       },
     },
 
     // -------------------------------------------------------
-    // INFLUENCED NODES — MEDIUM HIGHLIGHT + PULSE
+    // INFLUENCED NODES (YELLOW)
     // -------------------------------------------------------
     {
       selector: "node[isInfluenced = true][isSeed != true]",
       style: {
-        "background-color": "#eab308",
+        "background-color": "#eab308", // YELLOW
         "opacity": 0.9,
         "border-width": 3,
         "border-color": "#854d0e",
@@ -84,6 +88,8 @@ export function GraphView({ elements }: GraphViewProps) {
         "animation-duration": "1.2s",
         "animation-iteration-count": "infinite",
         "animation-direction": "alternate",
+        "z-index-compare": "manual",
+        "z-index": 500, // BELOW SEED, ABOVE NORMAL
       },
     },
 
@@ -95,7 +101,7 @@ export function GraphView({ elements }: GraphViewProps) {
       style: {
         "width": 1,
         "opacity": 0.2,
-        "line-color": "rgba(148,163,184,0.35)",
+        "line-color": "rgba(148,163,184,0.3)",
         "curve-style": "bezier",
       },
     },
@@ -106,7 +112,7 @@ export function GraphView({ elements }: GraphViewProps) {
     {
       selector: "edge[activated = true]",
       style: {
-        "line-color": "#22c55e",
+        "line-color": "#3b82f6", // match seed blue
         "width": 2,
         "opacity": 1,
       },
