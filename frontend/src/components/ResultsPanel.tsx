@@ -31,7 +31,11 @@ interface ResultsPanelProps {
   hasRun: boolean;
 }
 
+
+
 export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
+  const [localRuntime, setLocalRuntime] = useState<number | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<RunResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -42,8 +46,15 @@ export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
     setLoading(true);
     setError(null);
 
+    const start = performance.now(); // start measuring
+
     runIM(config)
-      .then((res) => setResult(res))
+      .then((res) => {
+        setResult(res);
+
+        const end = performance.now();
+        setLocalRuntime(end - start); // store ms
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [mode, hasRun, config]);
@@ -136,13 +147,14 @@ export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
             <ResultCard
               title="Runtime"
               value={
-                result.runtime !== undefined
-                  ? `${result.runtime.toFixed(3)} s`
+                localRuntime !== null
+                  ? `${(localRuntime / 1000).toFixed(2)}s`
                   : "—"
               }
-              subtitle="Algorithm runtime"
+              subtitle="Local request → response time"
               icon={Clock}
             />
+
 
             <ResultCard
               title="Operations"
