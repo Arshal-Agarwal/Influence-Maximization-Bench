@@ -2,7 +2,7 @@ import { Terminal, Cpu, Clock, Database } from "lucide-react";
 
 interface ComputationDetailsProps {
   config: {
-    graph: string;
+    graph: number;
     model: string;
     algorithm: string;
     seedSize: number;

@@ -7,6 +7,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.12); }
+}
+
+
 @layer base {
   :root {
     --background: 0 0% 99%;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Play, ChevronDown } from "lucide-react";
+import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/select";
 
 const graphs = [
-  { value: "sparse", label: "Sparse Graph" },
-  { value: "dense", label: "Dense Graph" },
-  { value: "scale-free", label: "Scale-Free Graph" },
-  { value: "random", label: "Random Graph" },
+  { value: 1, label: "Sparse" },
+  { value: 2, label: "Dense" },
+  { value: 3, label: "Scale Free" },
+  { value: 4, label: "Random" },
 ];
 
 const models = [
@@ -32,23 +32,24 @@ const modes = [
 ];
 
 const algorithmsIC = [
+  { value: "bruteforce", label: "Brute Force" },
   { value: "greedy", label: "Greedy" },
-  { value: "celf", label: "CELF" },
-  { value: "celf++", label: "CELF++" },
-  { value: "degree", label: "Degree Heuristic" },
-  { value: "random", label: "Random Selection" },
+  { value: "greedy_dp", label: "Greedy (DP Optimized)" },
+  { value: "heuristic", label: "Heuristic" },
+  { value: "degree_discount", label: "Degree Discount" },
 ];
 
 const algorithmsLT = [
-  { value: "greedy", label: "Greedy" },
-  { value: "celf", label: "CELF" },
-  { value: "degree", label: "Degree Heuristic" },
-  { value: "pagerank", label: "PageRank" },
+  { value: "bruteforce", label: "Brute Force" },
+  { value: "naive_greedy", label: "Naive Greedy" },
+  { value: "greedy_storage", label: "Greedy with Storage" },
+  { value: "local_dag", label: "Local DAG" },
 ];
+
 
 interface ControlPanelProps {
   onRun: (config: {
-    graph: string;
+    graph: number;
     model: string;
     mode: string;
     algorithm: string;
@@ -58,12 +59,12 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({ onRun }: ControlPanelProps) {
-  const [graph, setGraph] = useState("sparse");
+  const [graph, setGraph] = useState<number>(1);
   const [model, setModel] = useState("ic");
   const [mode, setMode] = useState("general");
   const [algorithm, setAlgorithm] = useState("greedy");
   const [seedSize, setSeedSize] = useState(10);
-  const [iterations, setIterations] = useState(1000);
+  const [iterations, setIterations] = useState(300);
 
   const algorithms = model === "ic" ? algorithmsIC : algorithmsLT;
 
@@ -75,16 +76,15 @@ export function ControlPanel({ onRun }: ControlPanelProps) {
     <aside className="w-80 border-r border-border bg-surface-elevated p-6 flex flex-col gap-6 overflow-y-auto">
       {/* Graph Selection */}
       <section className="space-y-3">
-        <Label className="text-caption uppercase tracking-wider text-muted-foreground font-medium">
-          Select Graph
-        </Label>
-        <Select value={graph} onValueChange={setGraph}>
-          <SelectTrigger className="w-full bg-background">
+        <Label className="text-caption uppercase text-muted-foreground">Select Graph</Label>
+
+        <Select value={String(graph)} onValueChange={(v) => setGraph(Number(v))}>
+          <SelectTrigger className="bg-background w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {graphs.map((g) => (
-              <SelectItem key={g.value} value={g.value}>
+              <SelectItem key={g.value} value={String(g.value)}>
                 {g.label}
               </SelectItem>
             ))}
@@ -94,11 +94,9 @@ export function ControlPanel({ onRun }: ControlPanelProps) {
 
       {/* Model Selection */}
       <section className="space-y-3">
-        <Label className="text-caption uppercase tracking-wider text-muted-foreground font-medium">
-          Select Model
-        </Label>
+        <Label className="text-caption uppercase text-muted-foreground">Select Model</Label>
         <Select value={model} onValueChange={setModel}>
-          <SelectTrigger className="w-full bg-background">
+          <SelectTrigger className="bg-background">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -111,34 +109,26 @@ export function ControlPanel({ onRun }: ControlPanelProps) {
         </Select>
       </section>
 
-      {/* Mode Selection */}
+      {/* Mode */}
       <section className="space-y-3">
-        <Label className="text-caption uppercase tracking-wider text-muted-foreground font-medium">
-          Select Mode
-        </Label>
-        <RadioGroup value={mode} onValueChange={setMode} className="space-y-2">
+        <Label className="text-caption uppercase text-muted-foreground">Select Mode</Label>
+        <RadioGroup value={mode} onValueChange={setMode}>
           {modes.map((m) => (
-            <div key={m.value} className="flex items-center space-x-3">
-              <RadioGroupItem value={m.value} id={m.value} />
-              <Label
-                htmlFor={m.value}
-                className="text-body text-foreground cursor-pointer font-normal"
-              >
-                {m.label}
-              </Label>
+            <div key={m.value} className="flex items-center gap-2">
+              <RadioGroupItem id={m.value} value={m.value} />
+              <Label htmlFor={m.value}>{m.label}</Label>
             </div>
           ))}
         </RadioGroup>
       </section>
 
-      {/* Algorithm Selection - Only visible in "run" mode */}
+      {/* Algorithm (only in run mode) */}
       {mode === "run" && (
-        <section className="space-y-3 animate-fade-in">
-          <Label className="text-caption uppercase tracking-wider text-muted-foreground font-medium">
-            Algorithm
-          </Label>
+        <section className="space-y-3">
+          <Label className="text-caption uppercase text-muted-foreground">Algorithm</Label>
+
           <Select value={algorithm} onValueChange={setAlgorithm}>
-            <SelectTrigger className="w-full bg-background">
+            <SelectTrigger className="bg-background">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -154,55 +144,35 @@ export function ControlPanel({ onRun }: ControlPanelProps) {
 
       {/* Parameters */}
       <section className="space-y-4">
-        <Label className="text-caption uppercase tracking-wider text-muted-foreground font-medium">
-          Parameters
-        </Label>
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="seedSize" className="text-body text-foreground">
-              Seed size (k)
-            </Label>
+        <Label className="text-caption uppercase text-muted-foreground">Parameters</Label>
+
+        <div className="space-y-2">
+          <div>
+            <Label htmlFor="seedSize">Seed size (k)</Label>
             <Input
               id="seedSize"
               type="number"
               value={seedSize}
               onChange={(e) => setSeedSize(Number(e.target.value))}
-              min={1}
-              max={100}
-              className="bg-background"
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="iterations" className="text-body text-foreground">
-              Monte Carlo iterations (R)
-            </Label>
+
+          <div>
+            <Label htmlFor="iterations">Iterations (R)</Label>
             <Input
               id="iterations"
               type="number"
               value={iterations}
               onChange={(e) => setIterations(Number(e.target.value))}
-              min={100}
-              max={10000}
-              step={100}
-              className="bg-background"
             />
           </div>
         </div>
       </section>
 
-      {/* Run Button */}
-      <Button
-        onClick={handleRun}
-        className="w-full mt-auto gap-2"
-        size="lg"
-      >
+      <Button onClick={handleRun} className="mt-auto w-full">
         <Play className="h-4 w-4" />
         Run
       </Button>
-
-      <p className="text-caption text-muted-foreground text-center">
-        Backend will compute influence spread and metrics.
-      </p>
     </aside>
   );
 }

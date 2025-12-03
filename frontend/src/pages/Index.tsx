@@ -22,7 +22,9 @@ const Index = () => {
       seedSize: newConfig.seedSize,
       iterations: newConfig.iterations,
     });
+
     setMode(newConfig.mode);
+
     if (newConfig.mode === "run") {
       setHasRun(true);
     }
