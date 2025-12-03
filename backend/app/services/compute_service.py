@@ -2,6 +2,7 @@ import uuid
 from app.services.graph_service import GraphService
 from app.services.model_service import ModelService
 from app.services.algorithm_service import AlgorithmService
+from app.utils.graph_to_cytoscape import graph_to_cytoscape
 
 from app.services.simulators.mc_simulator import monte_carlo_spread
 from app.storage.run_cache import RunCache
@@ -20,6 +21,7 @@ class ComputeService:
       - Model selection (IC/LT)
       - Monte Carlo evaluation
       - Result caching
+      - Graph formatting for frontend
     """
 
     @staticmethod
@@ -41,13 +43,12 @@ class ComputeService:
             )
 
             # ----------------------------
-            # 3. Select diffusion model
+            # 3. Select diffusion model (IC / LT)
             # ----------------------------
             model_runner = ModelService.get_model_runner(payload.model)
 
             # ----------------------------
             # 4. Compute seed set
-            #    (Algorithms expect MC evaluator optionally)
             # ----------------------------
             seed_set = algo_fn(
                 G,
@@ -58,9 +59,8 @@ class ComputeService:
             )
 
             # ----------------------------
-            # 5. Monte Carlo evaluation of seed set
+            # 5. Monte Carlo evaluation of the seed set
             # ----------------------------
-            # snippet inside ComputeService.run_im after mc_result is returned
             mc_result = monte_carlo_spread(
                 G,
                 seed_set,
@@ -69,17 +69,26 @@ class ComputeService:
                 seed=42
             )
 
+            # ----------------------------
+            # 6. Build Cytoscape graph elements
+            # ----------------------------
+            influenced_set = set(seed_set)  # placeholder for real diffusion trace
+            elements = graph_to_cytoscape(G, seed_set, influenced_set)
+
             result = {
                 "run_id": run_id,
                 "seed_set": seed_set,
                 "spread": mc_result["mean_spread"],
-                "variance": mc_result["variance"],     # <-- now filled
+                "variance": mc_result["variance"],
                 "runtime": mc_result["runtime"],
                 "operations": mc_result["ops"],
+
                 "graph": {
                     "nodes": G.number_of_nodes(),
                     "edges": G.number_of_edges()
-                }
+                },
+
+                "elements": elements
             }
 
             # ----------------------------
