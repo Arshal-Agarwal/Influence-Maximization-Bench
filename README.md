@@ -1,73 +1,167 @@
-# Welcome to your Lovable project  (1)
+# 📘 **Influence Maximization Bench**
 
-## Project info
+An interactive platform for **running, comparing, and visualizing Influence Maximization (IM) algorithms** on multiple graph types using **FastAPI (backend)** and **React + Cytoscape.js (frontend)**.
 
-**URL**: https://lovable.dev/projects/ce7c246c-ad58-49dc-a33c-3a5ff802118d
+This project provides:
 
-## How can I edit this code?
+* Efficient graph generators (sparse, dense, scale-free, random)
+* Classic IM algorithms (Greedy, Greedy (DP), Degree Discount, LT variants)
+* IC & LT diffusion models
+* Monte Carlo evaluation engine
+* Real-time graph visualization with seed highlighting & influence effects
+* Clean research-style UI for IM exploration
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+# ✨ Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ce7c246c-ad58-49dc-a33c-3a5ff802118d) and start prompting.
+### 🧠 **Implemented Algorithms**
 
-Changes made via Lovable will be committed automatically to this repo.
+#### **Independent Cascade (IC)**
 
-**Use your preferred IDE**
+* **Bruteforce** (only for tiny graphs ≤ 25 nodes)
+* **Greedy**
+* **Greedy (DP)**
+* **Heuristic**
+* **Degree Discount Heuristic**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+#### **Linear Threshold (LT)**
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+* **Bruteforce**
+* **Naive Greedy**
+* **Greedy with Storage**
+* **Local DAG Approximation**
 
-Follow these steps:
+No CELF or CELF++ are implemented in this version.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 📊 **Graph Types**
 
-# Step 3: Install the necessary dependencies.
-npm i
+| ID | Graph Type |
+| -- | ---------- |
+| 1  | Sparse     |
+| 2  | Dense      |
+| 3  | Scale-Free |
+| 4  | Random     |
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+---
+
+# 🔥 Backend Capabilities (FastAPI)
+
+* Graph generation & caching
+* Algorithm orchestration
+* IC/LT diffusion model simulation
+* Monte Carlo spread estimation
+* Operation counting and runtime measurement
+* Graph → Cytoscape conversion
+* Result caching + metadata logging
+
+The backend returns a **Cytoscape-ready graph** including:
+
+* Seed nodes (`isSeed: true`)
+* Influenced nodes (`isInfluenced: true`)
+* Node degrees
+* Edge activation info
+* Optional backend layout positions
+
+---
+
+# 🎨 Frontend Capabilities (React)
+
+* Cytoscape.js interactive visualization
+* Pulsing animation for influenced nodes
+* Green highlight for seed nodes
+* Clean, research-grade graph styling
+* Metric cards: spread, variance, operations, runtime
+* Algorithm comparison view
+* General info & computation details pages
+* Error states, loading states, smooth transitions
+
+---
+
+# 🚀 Getting Started
+
+## 1️⃣ Backend Setup (FastAPI)
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate         # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Start server:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend runs at:
+
+```
+http://localhost:8000
+```
+
+---
+
+## 2️⃣ Frontend Setup (React + Vite)
+
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Frontend runs at:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+http://localhost:5173
+```
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# 📡 API Overview
 
-## What technologies are used for this project?
+### Run an Influence Maximization experiment
 
-This project is built with:
+```
+POST /api/run
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Example:
 
-## How can I deploy this project?
+```bash
+curl -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{
+        "graph": 1,
+        "model": "ic",
+        "algorithm": "degree_discount",
+        "seedSize": 10,
+        "iterations": 500
+      }'
+```
 
-Simply open [Lovable](https://lovable.dev/projects/ce7c246c-ad58-49dc-a33c-3a5ff802118d) and click on Share -> Publish.
+### Response (simplified):
 
-## Can I connect a custom domain to my Lovable project?
+```json
+{
+  "run_id": "...",
+  "seed_set": [...],
+  "spread": 12.84,
+  "variance": 1.13,
+  "runtime": 0.032,
+  "operations": 87849,
+  "graph": { "nodes": 1024, "edges": 4096 },
+  "elements": { "nodes": [...], "edges": [...] }
+}
+```
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+# 🤝 Contributing
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Pull requests welcome — algorithms, visualizations, docs, and optimizations.
+
+---
