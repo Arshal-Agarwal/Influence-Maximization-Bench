@@ -1,0 +1,131 @@
+echo "IC - Bruteforce"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"ic","algorithm":"bruteforce","seedSize":3,"iterations":50}'
+echo
+
+echo "IC - Greedy"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"ic","algorithm":"greedy","seedSize":10,"iterations":300}'
+echo
+
+echo "IC - Greedy DP"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"ic","algorithm":"greedy_dp","seedSize":10,"iterations":300}'
+echo
+
+echo "IC - Heuristic"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"ic","algorithm":"heuristic","seedSize":10,"iterations":300}'
+echo
+
+echo "IC - Degree Discount"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"ic","algorithm":"degree_discount","seedSize":10,"iterations":500}'
+echo
+
+echo "LT - Bruteforce"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"lt","algorithm":"bruteforce","seedSize":3,"iterations":50}'
+echo
+
+echo "LT - Naive Greedy"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"lt","algorithm":"naive_greedy","seedSize":8,"iterations":200}'
+echo
+
+echo "LT - Greedy Storage"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"lt","algorithm":"greedy_storage","seedSize":8,"iterations":200}'
+echo
+
+echo "LT - Local DAG"
+curl -s -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"graph":1,"model":"lt","algorithm":"local_dag","seedSize":8,"iterations":200}'
+echo
+
+
+===========================================================================================
+MAIN APP RUN 
+
+uvicorn app.main:app --reload
+
+===========================================================================================
+
+Sample tests (so far)
+
+curl -X POST http://localhost:8000/api/run   -H "Content-Type: application/json"   -d '{
+        "graph": 1,
+        "model": "ic",
+        "algorithm": "heuristic",
+        "seedSize": 10,
+        "iterations": 300
+      }'
+{"run_id":"0cb48ed7-669f-4d10-aa71-0a9c60eaa5ad","seed_set":[93,111,19,89,315,190,114,283,429,813],"spread":11.556666666666667,"variance":1.8930992196209588,"runtime":1001.198893446126,"operations":45477,"graph":{"nodes":1024,"edges":4096}}(backend) 
+Atharva Kulkarni@LAPTOP-DACI0TR2 MINGW64 ~/Desktop/Study/TY/SEM I/DAAOA/Influence-Maximization-Bench/backend (master)
+$ curl -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{
+        "graph": 1,
+        "model": "ic",
+        "algorithm": "degree_discount",
+        "seedSize": 10,
+        "iterations": 500
+      }'
+Atharva Kulkarni@LAPTOP-DACI0TR2 MINGW64 ~/Desktop/Study/TY/SEM I/DAAOA/Influence-Maximization-Bench/backend (master)
+$ curl -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{
+        "graph": 1,
+        "model": "ic",
+        "algorithm": "degree_discount",
+        "seedSize": 10,
+        "iterations": 500
+      }'
+$ curl -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{
+        "graph": 1,
+        "model": "ic",
+        "algorithm": "degree_discount",
+        "seedSize": 10,
+        "iterations": 500
+      }'
+  -d '{
+        "graph": 1,
+        "model": "ic",
+        "algorithm": "degree_discount",
+        "seedSize": 10,
+        "iterations": 500
+      }'
+        "model": "ic",
+        "algorithm": "degree_discount",
+        "seedSize": 10,
+        "iterations": 500
+      }'
+        "seedSize": 10,
+        "iterations": 500
+      }'
+{"run_id":"d8cc0976-88fa-40c4-90db-cb20808c7b18","seed_set":[233,781,13,111,19,820,281,59,93,190],"spread":11.846,"variance":2.190665330661323        "iterations": 500
+      }'
+{"run_id":"d8cc0976-88fa-40c4-90db-cb20808c7b18","seed_set":[233,781,13,111,19,820,281,59,93,190],"spread":11.846,"variance":2.190665330661323{"run_id":"d8cc0976-88fa-40c4-90db-cb20808c7b18","seed_set":[233,781,13,111,19,820,281,59,93,190],"spread":11.846,"variance":2.190665330661323,"runtime":3034.2868894763233,"operations":87849,"graph":{"nodes":1024,"edges":4096}}(backend)
+Atharva Kulkarni@LAPTOP-DACI0TR2 MINGW64 ~/Desktop/Study/TY/SEM I/DAAOA/Influence-Maximization-Bench/backend (master)
+Atharva Kulkarni@LAPTOP-DACI0TR2 MINGW64 ~/Desktop/Study/TY/SEM I/DAAOA/Influence-Maximization-Bench/backend (master)
+$ curl -X POST http://localhost:8000/api/run \
+  -H "Content-Type: application/json" \
+  -d '{
+        "graph": 1,
+        "model": "lt",
+        "algorithm": "bruteforce",
+        "seedSize": 3,
+        "iterations": 50
+      }'
+{"detail":"LT bruteforce only allowed for n <= 25, got n=1024"}(backend)
