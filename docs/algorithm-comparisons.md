@@ -1,0 +1,16 @@
+# Unified Algorithm Comparison Table — IC + LT Influence Maximization
+
+| Algorithm                   | Model | Time Complexity                                   | Space Complexity | Short Notes                                                                                                     |
+| --------------------------- | ----- | ------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Brute Force**             | IC    | $(O\left(\binom{n}{k} \cdot R \cdot (m+n)\right))$ | $(O(1))$ extra     | Enumerates all seed sets; uses MC to compute spread; exact but infeasible.                                      |
+| **Brute Force**             | LT    | $(O\left(\binom{n}{k} \cdot R \cdot (m+n)\right))$ | $(O(1))$ extra     | Same logic as IC brute force; LT simulations slightly faster; still impossible for real graphs.                 |
+| **Degree Heuristic**        | IC/LT | $(O(m + n\log n)) $                                 | $(O(n))$           | Picks top-(k) by out-degree; very fast but crude.                                                               |
+| **Weighted Degree**         | IC/LT | $(O(m + n\log n))  $                                | $(O(n)) $          | Uses (\sum p_{uv}) weights; slightly more model-aware.                                                          |
+| **PageRank**                | IC/LT | $(O(\text{iter} \cdot m)) $                         | $(O(n))  $         | Spectral centrality; multi-hop awareness; ignores seed interaction; must reverse edges for influence-as-source. |
+| **Random Selection**        | IC/LT | $(O(k))  $                                          | $(O(1))  $         | Baseline; useful only for comparison/testing.                                                                   |
+| **Degree-Discount (DD-IC)** | IC    | $(O(m + k\log n)) $                                 | $(O(n))  $         | Adjusts score when neighbors become seeds; approximates diminishing returns; strong fast heuristic.             |
+| **Naive Greedy (MC-based)** | IC    | $(O(k \cdot n \cdot R \cdot (m+n)))   $             | $(O(n))  $         | Computes real marginal gains with MC; accurate but extremely slow; theoretical guarantee.                       |
+| **Greedy-DP (IC on DAG)**   | IC    | $(O(k \cdot n \cdot (m+n)))   $                     | $(O(n))   $        | Exact IC influence on DAGs via DP; deterministic; conceptually bridges to RR-sets.                              |
+| **Naive Greedy (MC-based)** | LT    | $(O(k \cdot n \cdot R \cdot (m+n)))  $              | $(O(n))  $         | Same greedy idea as IC but LT simulation uses threshold sampling; more stable than IC.                          |
+| **Greedy-Storage (LT)**     | LT    | $(O(k \cdot (m + R(m+n))))  $                       | $(O(n))  $         | Stores cumulative incoming weights; reduces recomputation; faster than LT naive greedy.                         |
+| **Local-DAG (LT)**          | LT    | $(O(nm))$ worst-case                                | $(O(n))  $         | Computes exact influence in locally acyclic regions; deterministic; good for sparse or hierarchical graphs.     |
