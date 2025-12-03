@@ -1,1 +1,3 @@
-sparse -> LT -> 
+sparse -> LT -> LDAG -> 10 -> 10
+
+random -> IC -> Greedy-DP -> 9 -> 50
