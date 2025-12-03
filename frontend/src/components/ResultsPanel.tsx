@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import {
-  Users, TrendingUp, Clock, Cpu, Network, BarChart3, Zap, AlertTriangle
+  Users,
+  TrendingUp,
+  Clock,
+  Cpu,
+  Network,
+  BarChart3,
+  Zap,
+  AlertTriangle
 } from "lucide-react";
 
 import { ResultCard } from "./ResultCard";
@@ -43,30 +50,45 @@ export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
 
   return (
     <main className="flex-1 p-8 overflow-y-auto bg-surface">
-      
+      {/* ------------------------------------------- */}
+      {/* STATIC MODES */}
+      {/* ------------------------------------------- */}
       {mode === "general" && <GeneralInfo />}
       {mode === "compare" && <ComparisonTable />}
       {mode === "details" && <ComputationDetails config={config} />}
 
+      {/* ------------------------------------------- */}
+      {/* RUN MODE — NOT STARTED */}
+      {/* ------------------------------------------- */}
       {mode === "run" && !hasRun && (
         <div className="flex items-center justify-center h-full">
           <div className="text-center space-y-4">
             <Zap className="h-12 w-12 mx-auto text-muted-foreground" />
             <h2 className="text-heading">Ready to Run</h2>
-            <p className="text-body text-muted-foreground">Choose parameters then click Run.</p>
+            <p className="text-body text-muted-foreground">
+              Choose parameters then click Run.
+            </p>
           </div>
         </div>
       )}
 
+      {/* ------------------------------------------- */}
+      {/* RUN MODE — LOADING */}
+      {/* ------------------------------------------- */}
       {mode === "run" && hasRun && loading && (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
             <Cpu className="h-12 w-12 mx-auto animate-spin text-muted-foreground" />
-            <p className="text-body text-muted-foreground mt-4">Computing...</p>
+            <p className="text-body text-muted-foreground mt-4">
+              Computing...
+            </p>
           </div>
         </div>
       )}
 
+      {/* ------------------------------------------- */}
+      {/* RUN MODE — ERROR */}
+      {/* ------------------------------------------- */}
       {mode === "run" && hasRun && error && (
         <div className="flex items-center justify-center h-full">
           <div className="text-center space-y-3">
@@ -76,13 +98,17 @@ export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
         </div>
       )}
 
+      {/* ------------------------------------------- */}
+      {/* RUN MODE — SUCCESS */}
+      {/* ------------------------------------------- */}
       {mode === "run" && hasRun && !loading && !error && result && (
-        <div className="space-y-10">
-          
+        <div className="space-y-10 animate-fade-in">
+          {/* HEADER */}
           <div>
             <h2 className="text-title">Results</h2>
             <p className="text-body text-muted-foreground">
-              {config.algorithm} on graph {config.graph} ({config.model.toUpperCase()})
+              {config.algorithm} on graph {config.graph} (
+              {config.model.toUpperCase()})
             </p>
           </div>
 
@@ -99,19 +125,22 @@ export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
             <ResultCard
               title="Spread"
               value={result.spread?.toFixed(2) ?? "—"}
-              subtitle={result.variance ? `±${result.variance.toFixed(2)}` : ""}
+              subtitle={
+                result.variance ? `±${result.variance.toFixed(2)}` : ""
+              }
               icon={TrendingUp}
               variant="success"
             />
 
+            {/* FIXED RUNTIME DISPLAY */}
             <ResultCard
               title="Runtime"
               value={
-                result?.localRuntime
-                  ? `${(result.localRuntime / 1000).toFixed(2)} s`
+                result.runtime !== undefined
+                  ? `${result.runtime.toFixed(3)} s`
                   : "—"
               }
-              subtitle="Request → Response time"
+              subtitle="Algorithm runtime"
               icon={Clock}
             />
 
@@ -124,8 +153,12 @@ export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
 
             <ResultCard
               title="Graph Size"
-              value={result?.graph ? `n=${result.graph.nodes}` : "—"}
-              subtitle={result?.graph ? `m=${result.graph.edges}` : ""}
+              value={
+                result.graph ? `n=${result.graph.nodes}` : "—"
+              }
+              subtitle={
+                result.graph ? `m=${result.graph.edges}` : ""
+              }
               icon={Network}
             />
 
@@ -137,17 +170,22 @@ export function ResultsPanel({ mode, config, hasRun }: ResultsPanelProps) {
             />
           </div>
 
-          {/* GRAPH VISUALIZER */}
+          {/* GRAPH VISUALIZATION */}
           {result.elements && (
-            <div>
-              <h3 className="text-label mb-2 text-foreground">Graph Visualization</h3>
+            <div className="space-y-2">
+              <h3 className="text-label text-foreground">
+                Graph Visualization
+              </h3>
+              <p className="text-caption text-muted-foreground">
+                Seed nodes are highlighted. Uninfluenced nodes are
+                faded for clarity.
+              </p>
+
               <GraphView elements={result.elements} />
             </div>
           )}
-
         </div>
       )}
-
     </main>
   );
 }
